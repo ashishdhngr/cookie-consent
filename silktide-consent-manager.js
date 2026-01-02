@@ -1246,7 +1246,7 @@ class SilktideCookieBanner {
       'Get this banner for free';
     const creditLinkAccessibleLabel =
       this.config.text?.preferences?.creditLinkAccessibleLabel;
-    const creditLink = ``;
+    const creditLink = ' ';
 
     const modalContent = `
       <header>
