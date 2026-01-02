@@ -817,14 +817,11 @@ class SilktideCookieBanner {
   }
 
   showBackdrop() {
-    console.log('👁️ showBackdrop called');
     if (this.backdrop) {
       this.backdrop.style.display = 'block';
-      console.log('  - backdrop displayed');
     }
     if (this.backdropGlobal) {
       this.backdropGlobal.style.display = 'block';
-      console.log('  - backdropGlobal displayed');
     }
     // Trigger optional onBackdropOpen callback
     if (typeof this.config.onBackdropOpen === 'function') {
@@ -833,14 +830,11 @@ class SilktideCookieBanner {
   }
 
   hideBackdrop() {
-    console.log('🙈 hideBackdrop called');
     if (this.backdrop) {
       this.backdrop.style.display = 'none';
-      console.log('  - backdrop hidden');
     }
     if (this.backdropGlobal) {
       this.backdropGlobal.style.display = 'none';
-      console.log('  - backdropGlobal hidden');
     }
 
     // Trigger optional onBackdropClose callback
@@ -926,24 +920,13 @@ class SilktideCookieBanner {
   // Consent Handling
   // ----------------------------------------------------------------
   handleCookieChoice(accepted) {
-    console.log('🍪 handleCookieChoice called, accepted:', accepted);
-
     // We set that an initial choice was made regardless of what it was so we don't show the banner again
     this.setInitialCookieChoiceMade();
 
     this.removeBanner();
-
-    // Close modal if it exists (this will handle backdrop hiding and scroll restoration)
-    // If modal doesn't exist, we still need to clean up
-    if (this.modal) {
-      console.log('  - Closing modal');
-      this.toggleModal(false);
-    } else {
-      console.log('  - No modal to close, cleaning up backdrop and scroll');
-      // Modal was never opened, but we still need to hide backdrop from banner
-      this.hideBackdrop();
-      this.allowBodyScroll();
-    }
+    this.hideBackdrop();
+    this.toggleModal(false);
+    this.showCookieIcon();
 
     this.config.cookieTypes.forEach((type) => {
       // Set localStorage and run accept/reject callbacks
@@ -1330,11 +1313,9 @@ class SilktideCookieBanner {
   toggleModal(show) {
     if (!this.modal) return;
 
-    console.log(`toggleModal(${show})`);
     this.modal.style.display = show ? 'flex' : 'none';
 
     if (show) {
-      console.log('🔵 Opening modal');
       this.showBackdrop();
       this.hideCookieIcon();
       this.removeBanner();
@@ -1359,24 +1340,9 @@ class SilktideCookieBanner {
       // Save current checkbox states to storage
       this.updateCheckboxState(true);
 
-      // Hide backdrop and restore page interaction
       this.hideBackdrop();
-
-      // Restore body scrolling
-      this.allowBodyScroll();
-
-      // Show cookie icon
       this.showCookieIcon();
-
-      // Double-check that backdrop elements are hidden (safety check)
-      if (this.backdrop) {
-        this.backdrop.style.display = 'none';
-      }
-      if (this.backdropGlobal) {
-        this.backdropGlobal.style.display = 'none';
-      }
-
-      console.log('✅ Modal closed - backdrop hidden, scroll restored');
+      this.allowBodyScroll();
 
       // Trigger optional onPreferencesClose callback
       if (typeof this.config.onPreferencesClose === 'function') {
@@ -1505,7 +1471,7 @@ class SilktideCookieBanner {
         this.handleCookieChoice(false)
       );
       preferencesButton?.addEventListener('click', () => {
-        // toggleModal(true) will handle showing the backdrop
+        this.showBackdrop();
         this.toggleModal(true);
       });
 
@@ -1676,40 +1642,16 @@ class SilktideCookieBanner {
   }
 
   preventBodyScroll() {
-    console.log('🔒 preventBodyScroll called');
     document.body.style.overflow = 'hidden';
     // Prevent iOS Safari scrolling
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
-    console.log(
-      'Body styles:',
-      document.body.style.overflow,
-      document.body.style.position
-    );
   }
 
   allowBodyScroll() {
-    console.log('🔓 allowBodyScroll called');
-    // Remove inline styles to restore scrolling
-    document.body.style.removeProperty('overflow');
-    document.body.style.removeProperty('position');
-    document.body.style.removeProperty('width');
-
-    // Double-check they're cleared (fallback)
-    if (document.body.style.overflow) {
-      document.body.style.overflow = '';
-    }
-    if (document.body.style.position) {
-      document.body.style.position = '';
-    }
-    if (document.body.style.width) {
-      document.body.style.width = '';
-    }
-
-    console.log(
-      'Body styles after restore:',
-      document.body.style.cssText || 'none'
-    );
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
   }
 }
 

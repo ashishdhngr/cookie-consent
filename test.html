@@ -1,387 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Silktide Consent Manager - Shadow DOM Test</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silktide Consent Manager - Shadow DOM Test</title>
+  
+  <!-- Simulate conflicting website CSS that could interfere with widget -->
+  <style>
+    /* These styles should NOT affect the widget */
+    * {
+      font-family: 'Comic Sans MS', cursive !important;
+      color: red !important;
+    }
+    
+    button {
+      background-color: lime !important;
+      border: 5px solid purple !important;
+      font-size: 50px !important;
+    }
+    
+    div {
+      border: 10px solid orange !important;
+    }
+    
+    a {
+      color: blue !important;
+      text-decoration: none !important;
+    }
+    
+    /* Widget CSS should NOT affect these site elements */
+    .site-content {
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    
+    .site-button {
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+  
+  <!-- Google Tag Manager / Consent Mode simulation -->
+  <script>
+    // Simulate Google Consent Mode
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    
+    // Initialize consent mode
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+    
+    console.log('Google Consent Mode initialized');
+  </script>
+</head>
+<body>
+  <div class="site-content">
+    <h1>Cookie Consent Widget Test</h1>
+    <p>This page tests the Shadow DOM implementation of the Silktide Consent Manager.</p>
+    <p>The widget should be isolated from the red text, lime buttons, and orange borders defined in the site CSS.</p>
+    
+    <button class="site-button" onclick="alert('Site button clicked - widget CSS should not affect this')">
+      Site Button (should be dark, not purple)
+    </button>
+    
+    <h2>Test Checklist:</h2>
+    <ul>
+      <li>✅ Widget appears with correct styling (not affected by site CSS)</li>
+      <li>✅ Site elements not affected by widget CSS</li>
+      <li>✅ Shadow DOM is created (check DevTools)</li>
+      <li>✅ Google Consent Mode callbacks work</li>
+      <li>✅ All widget functionality works</li>
+    </ul>
+  </div>
 
-    <!-- Simulate conflicting website CSS that could interfere with widget -->
-    <style>
-      /* These styles should NOT affect the widget */
-      * {
-        font-family: 'Comic Sans MS', cursive !important;
-        color: red !important;
-      }
-
-      button {
-        background-color: lime !important;
-        border: 5px solid purple !important;
-        font-size: 50px !important;
-      }
-
-      div {
-        border: 10px solid orange !important;
-      }
-
-      a {
-        color: blue !important;
-        text-decoration: none !important;
-      }
-
-      /* Widget CSS should NOT affect these site elements */
-      .site-content {
-        padding: 20px;
-        background: #f0f0f0;
-      }
-
-      .site-button {
-        background: #333;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        cursor: pointer;
-      }
-    </style>
-
-    <!-- Google Tag Manager / Consent Mode simulation -->
-    <script>
-      // Simulate Google Consent Mode
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-
-      // Initialize consent mode
-      gtag('consent', 'default', {
-        analytics_storage: 'denied',
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-      });
-
-      console.log('Google Consent Mode initialized');
-    </script>
-  </head>
-  <body>
-    <div class="site-content">
-      <h1>Cookie Consent Widget Test</h1>
-      <p>
-        This page tests the Shadow DOM implementation of the Silktide Consent
-        Manager.
-      </p>
-      <p>
-        The widget should be isolated from the red text, lime buttons, and
-        orange borders defined in the site CSS.
-      </p>
-
-      <button
-        class="site-button"
-        onclick="alert('Site button clicked - widget CSS should not affect this')"
-      >
-        Site Button (should be dark, not purple)
-      </button>
-
-      <h2>Test Checklist:</h2>
-      <ul>
-        <li>
-          ✅ Widget appears with correct styling (not affected by site CSS)
-        </li>
-        <li>✅ Site elements not affected by widget CSS</li>
-        <li>✅ Shadow DOM is created (check DevTools)</li>
-        <li>✅ Google Consent Mode callbacks work</li>
-        <li>✅ All widget functionality works</li>
-      </ul>
-    </div>
-
-    <!-- Single script import - no CSS file needed -->
-    <script src="silktide-consent-manager.js"></script>
-    <script>
-      // Initialize the widget
-      silktideCookieBannerManager.updateCookieBannerConfig({
-        background: {
-          showBackground: true,
+  <!-- Single script import - no CSS file needed -->
+  <script src="silktide-consent-manager.js"></script>
+  <script>
+    // Initialize the widget
+    silktideCookieBannerManager.updateCookieBannerConfig({
+      background: {
+        showBackground: true
+      },
+      cookieIcon: {
+        position: "bottomLeft"
+      },
+      cookieTypes: [
+        {
+          id: "necessary",
+          name: "Necessary",
+          description: "<p>These cookies are necessary for the website to function properly and cannot be switched off. They help with things like logging in and setting your privacy preferences.</p>",
+          required: true,
+          onAccept: function() {
+            console.log('✅ Necessary cookies accepted');
+          }
         },
-        cookieIcon: {
-          position: 'bottomLeft',
-        },
-        cookieTypes: [
-          {
-            id: 'necessary',
-            name: 'Necessary',
-            description:
-              '<p>These cookies are necessary for the website to function properly and cannot be switched off. They help with things like logging in and setting your privacy preferences.</p>',
-            required: true,
-            onAccept: function () {
-              console.log('✅ Necessary cookies accepted');
-            },
+        {
+          id: "analytics",
+          name: "Analytics",
+          description: "<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
+          defaultValue: true,
+          onAccept: function() {
+            console.log('✅ Analytics cookies accepted');
+            // Test Google Consent Mode integration
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                analytics_storage: 'granted',
+              });
+              console.log('✅ Google Consent Mode updated: analytics_storage = granted');
+            }
+            if (window.dataLayer) {
+              window.dataLayer.push({
+                'event': 'consent_accepted_analytics',
+              });
+              console.log('✅ DataLayer event pushed: consent_accepted_analytics');
+            }
           },
-          {
-            id: 'analytics',
-            name: 'Analytics',
-            description:
-              '<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>',
-            defaultValue: true,
-            onAccept: function () {
-              console.log('✅ Analytics cookies accepted');
-              // Test Google Consent Mode integration
-              if (typeof gtag === 'function') {
-                gtag('consent', 'update', {
-                  analytics_storage: 'granted',
-                });
-                console.log(
-                  '✅ Google Consent Mode updated: analytics_storage = granted'
-                );
-              }
-              if (window.dataLayer) {
-                window.dataLayer.push({
-                  event: 'consent_accepted_analytics',
-                });
-                console.log(
-                  '✅ DataLayer event pushed: consent_accepted_analytics'
-                );
-              }
-            },
-            onReject: function () {
-              console.log('✅ Analytics cookies rejected');
-              if (typeof gtag === 'function') {
-                gtag('consent', 'update', {
-                  analytics_storage: 'denied',
-                });
-                console.log(
-                  '✅ Google Consent Mode updated: analytics_storage = denied'
-                );
-              }
-            },
-          },
-          {
-            id: 'advertising',
-            name: 'Advertising',
-            description:
-              '<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>',
-            onAccept: function () {
-              console.log('✅ Advertising cookies accepted');
-              if (typeof gtag === 'function') {
-                gtag('consent', 'update', {
-                  ad_storage: 'granted',
-                  ad_user_data: 'granted',
-                  ad_personalization: 'granted',
-                });
-                console.log(
-                  '✅ Google Consent Mode updated: ad_storage = granted'
-                );
-              }
-              if (window.dataLayer) {
-                window.dataLayer.push({
-                  event: 'consent_accepted_advertising',
-                });
-                console.log(
-                  '✅ DataLayer event pushed: consent_accepted_advertising'
-                );
-              }
-            },
-            onReject: function () {
-              console.log('✅ Advertising cookies rejected');
-              if (typeof gtag === 'function') {
-                gtag('consent', 'update', {
-                  ad_storage: 'denied',
-                  ad_user_data: 'denied',
-                  ad_personalization: 'denied',
-                });
-                console.log(
-                  '✅ Google Consent Mode updated: ad_storage = denied'
-                );
-              }
-            },
-          },
-        ],
-        text: {
-          banner: {
-            description:
-              '<p>We use cookies on our site to enhance your user experience, provide personalized content, and analyze our traffic. <a href="#" target="_blank">Cookie Policy.</a></p>',
-            acceptAllButtonText: 'Accept all',
-            acceptAllButtonAccessibleLabel: 'Accept all cookies',
-            rejectNonEssentialButtonText: 'Reject non-essential',
-            rejectNonEssentialButtonAccessibleLabel: 'Reject non-essential',
-            preferencesButtonText: 'Preferences',
-            preferencesButtonAccessibleLabel: 'Toggle preferences',
-          },
-          preferences: {
-            title: 'Customize your cookie preferences',
-            description:
-              '<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>',
-            creditLinkText: 'Get this banner for free',
-            creditLinkAccessibleLabel: 'Get this banner for free',
-          },
-        },
-        onBannerOpen: function () {
-          console.log('✅ Banner opened');
-        },
-        onBannerClose: function () {
-          console.log('✅ Banner closed');
-        },
-        onPreferencesOpen: function () {
-          console.log('✅ Preferences modal opened');
-        },
-        onPreferencesClose: function () {
-          console.log('✅ Preferences modal closed');
-        },
-      });
-
-      // Log Shadow DOM support and test CSS isolation
-      setTimeout(() => {
-        const wrapper = document.getElementById('silktide-wrapper');
-        if (wrapper && wrapper.shadowRoot) {
-          console.log('✅ Shadow DOM is active - CSS isolation enabled');
-          console.log('Shadow Root:', wrapper.shadowRoot);
-
-          // Test CSS isolation
-          const banner = wrapper.shadowRoot.querySelector('#silktide-banner');
-          if (banner) {
-            const computedStyle = window.getComputedStyle(banner);
-            console.log('Banner computed color:', computedStyle.color);
-            console.log(
-              'Banner computed font-family:',
-              computedStyle.fontFamily
-            );
-            console.log(
-              'Banner computed background:',
-              computedStyle.backgroundColor
-            );
-
-            if (
-              computedStyle.color === 'rgb(255, 0, 0)' ||
-              computedStyle.color === 'red'
-            ) {
-              console.error(
-                '❌ CSS ISOLATION FAILED: Widget has red text from site CSS!'
-              );
-            } else {
-              console.log(
-                '✅ CSS ISOLATION WORKING: Widget has correct styling'
-              );
+          onReject: function() {
+            console.log('✅ Analytics cookies rejected');
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                analytics_storage: 'denied',
+              });
+              console.log('✅ Google Consent Mode updated: analytics_storage = denied');
             }
           }
-        } else {
-          console.log('⚠️ Shadow DOM not supported - using fallback mode');
+        },
+        {
+          id: "advertising",
+          name: "Advertising",
+          description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
+          onAccept: function() {
+            console.log('✅ Advertising cookies accepted');
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                ad_storage: 'granted',
+                ad_user_data: 'granted',
+                ad_personalization: 'granted',
+              });
+              console.log('✅ Google Consent Mode updated: ad_storage = granted');
+            }
+            if (window.dataLayer) {
+              window.dataLayer.push({
+                'event': 'consent_accepted_advertising',
+              });
+              console.log('✅ DataLayer event pushed: consent_accepted_advertising');
+            }
+          },
+          onReject: function() {
+            console.log('✅ Advertising cookies rejected');
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                ad_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+              });
+              console.log('✅ Google Consent Mode updated: ad_storage = denied');
+            }
+          }
         }
-      }, 500);
-    </script>
-    <script>
-      silktideCookieBannerManager.updateCookieBannerConfig({
-        background: { showBackground: true },
-        cookieIcon: { position: 'bottomRight' },
-
-        cookieTypes: [
-          {
-            id: 'necessary',
-            name: 'Necessary',
-            description: `
-        <p><strong>Always on.</strong> These cookies are essential for the website to function
-        (security, basic navigation, accessibility, and saving your cookie preferences).</p>
-      `,
-            required: true,
-            onAccept: function () {},
-          },
-
-          {
-            id: 'analytics',
-            name: 'Analytics',
-            description: `
-        <p>These cookies and tracking technologies help us understand how people use our
-        website so we can improve performance and user experience. We only run these if you
-        consent.</p>
-
-        <p><strong>Used services:</strong></p>
-        <ul>
-          <li><strong>Google Analytics 4 (GA4)</strong> – site usage and behavior analytics</li>
-          <li><strong>Microsoft Clarity</strong> – session recordings, heatmaps, and usage insights</li>
-          <li><strong>RudderStack</strong> – unified analytics event routing</li>
-        </ul>
-      `,
-            defaultValue: true,
-            onAccept: function () {
-              gtag('consent', 'update', { analytics_storage: 'granted' });
-              dataLayer.push({ event: 'consent_accepted_analytics' });
-            },
-            onReject: function () {
-              gtag('consent', 'update', { analytics_storage: 'denied' });
-            },
-          },
-
-          {
-            id: 'advertising',
-            name: 'Advertising / Targeting',
-            description: `
-        <p>These cookies and tracking technologies help deliver more relevant ads and measure
-        advertising effectiveness across devices and platforms. They may collect data about
-        browsing activities across websites.</p>
-
-        <p><strong>Used services:</strong></p>
-        <ul>
-          <li><strong>Meta Pixel</strong> – ad measurement and conversion tracking for Facebook/Instagram</li>
-          <li><strong>TikTok Pixel</strong> – audience and conversion tracking for TikTok ads</li>
-          <li><strong>Snap Pixel</strong> – ad performance tracking for Snapchat</li>
-        </ul>
-      `,
-            onAccept: function () {
-              // gtag('consent', 'update', {
-              //   ad_storage: 'granted',
-              //   ad_user_data: 'granted',
-              //   ad_personalization: 'granted'
-              // });
-              // dataLayer.push({ event: 'consent_accepted_advertising' });
-            },
-            onReject: function () {
-              // gtag('consent', 'update', {
-              //   ad_storage: 'denied',
-              //   ad_user_data: 'denied',
-              //   ad_personalization: 'denied'
-              // });
-            },
-          },
-        ],
-
-        text: {
-          banner: {
-            description: `
-        <p>
-          We and our partners use cookies and similar tracking technologies to operate the site,
-          analyze traffic, improve user experience, and (if enabled) deliver and measure
-          relevant advertising. You can accept all cookies, reject non-essential cookies, or
-          customize your preferences.
-          <a href="https://www.trinitasintelligence.com/privacy-policy" target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </a>
-          &nbsp;|&nbsp;
-          <a href="https://www.trinitasintelligence.com/cookie-policy" target="_blank" rel="noopener noreferrer">
-            Cookie Policy
-          </a>
-        </p>
-      `,
-            acceptAllButtonText: 'Accept all',
-            acceptAllButtonAccessibleLabel: 'Accept all cookies',
-            rejectNonEssentialButtonText: 'Reject non-essential',
-            rejectNonEssentialButtonAccessibleLabel:
-              'Reject non-essential cookies',
-            preferencesButtonText: 'Preferences',
-            preferencesButtonAccessibleLabel: 'Manage cookie preferences',
-          },
-
-          preferences: {
-            title: 'Cookie preferences',
-            description: `
-        <p>
-          Choose which optional cookies and tracking technologies you want to enable. These
-          preferences apply to your visit and can be updated at any time.
-        </p>
-      `,
-          },
+      ],
+      text: {
+        banner: {
+          description: "<p>We use cookies on our site to enhance your user experience, provide personalized content, and analyze our traffic. <a href=\"#\" target=\"_blank\">Cookie Policy.</a></p>",
+          acceptAllButtonText: "Accept all",
+          acceptAllButtonAccessibleLabel: "Accept all cookies",
+          rejectNonEssentialButtonText: "Reject non-essential",
+          rejectNonEssentialButtonAccessibleLabel: "Reject non-essential",
+          preferencesButtonText: "Preferences",
+          preferencesButtonAccessibleLabel: "Toggle preferences"
         },
-
-        position: {
-          banner: 'bottomRight',
-        },
-      });
-    </script>
-  </body>
+        preferences: {
+          title: "Customize your cookie preferences",
+          description: "<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>",
+          creditLinkText: "Get this banner for free",
+          creditLinkAccessibleLabel: "Get this banner for free"
+        }
+      },
+      onBannerOpen: function() {
+        console.log('✅ Banner opened');
+      },
+      onBannerClose: function() {
+        console.log('✅ Banner closed');
+      },
+      onPreferencesOpen: function() {
+        console.log('✅ Preferences modal opened');
+      },
+      onPreferencesClose: function() {
+        console.log('✅ Preferences modal closed');
+      }
+    });
+    
+    // Log Shadow DOM support and test CSS isolation
+    setTimeout(() => {
+      const wrapper = document.getElementById('silktide-wrapper');
+      if (wrapper && wrapper.shadowRoot) {
+        console.log('✅ Shadow DOM is active - CSS isolation enabled');
+        console.log('Shadow Root:', wrapper.shadowRoot);
+        
+        // Test CSS isolation
+        const banner = wrapper.shadowRoot.querySelector('#silktide-banner');
+        if (banner) {
+          const computedStyle = window.getComputedStyle(banner);
+          console.log('Banner computed color:', computedStyle.color);
+          console.log('Banner computed font-family:', computedStyle.fontFamily);
+          console.log('Banner computed background:', computedStyle.backgroundColor);
+          
+          if (computedStyle.color === 'rgb(255, 0, 0)' || computedStyle.color === 'red') {
+            console.error('❌ CSS ISOLATION FAILED: Widget has red text from site CSS!');
+          } else {
+            console.log('✅ CSS ISOLATION WORKING: Widget has correct styling');
+          }
+        }
+      } else {
+        console.log('⚠️ Shadow DOM not supported - using fallback mode');
+      }
+    }, 500);
+  </script>
+</body>
 </html>
+
