@@ -1699,10 +1699,17 @@ class SilktideCookieBanner {
     document.head.appendChild(script);
   }
 
+  function openPreferences() {
+    if (cookieBanner && cookieBanner.modal) {
+      cookieBanner.toggleModal(true);
+    }
+  }
+
   window.silktideCookieBannerManager.initCookieBanner = initCookieBanner;
   window.silktideCookieBannerManager.updateCookieBannerConfig =
     updateCookieBannerConfig;
   window.silktideCookieBannerManager.injectScript = injectScript;
+  window.silktideCookieBannerManager.openPreferences = openPreferences;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCookieBanner, {
