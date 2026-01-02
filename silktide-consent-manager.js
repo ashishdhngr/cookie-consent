@@ -1393,12 +1393,9 @@ class SilktideCookieBanner {
   }
 
   showCookieIcon() {
-    // edit/modified -
-    return;
-    // original code -
-    // if (this.cookieIcon) {
-    //   this.cookieIcon.style.display = 'flex';
-    // }
+    if (this.cookieIcon) {
+      this.cookieIcon.style.display = 'flex';
+    }
   }
 
   hideCookieIcon() {
