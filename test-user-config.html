@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test User Config</title>
+  <style>
+    body {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      min-height: 2000px; /* Make page scrollable */
+    }
+    .test-button {
+      padding: 15px 30px;
+      margin: 20px;
+      font-size: 18px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+    }
+    .content {
+      line-height: 2;
+    }
+  </style>
+  
+  <!-- Google Tag Manager / Consent Mode simulation -->
+  <script>
+    // Simulate Google Consent Mode
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    
+    // Initialize consent mode
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+    
+    console.log('Google Consent Mode initialized');
+  </script>
+</head>
+<body>
+  <h1>Testing User Configuration</h1>
+  <button class="test-button" onclick="alert('Button works!')">Test Click</button>
+  <p>Try scrolling and clicking after closing the modal...</p>
+  
+  <div class="content">
+    <p style="margin-top: 300px">Scroll test content...</p>
+    <p style="margin-top: 300px">More content...</p>
+    <p style="margin-top: 300px">Even more content...</p>
+    <p style="margin-top: 300px">Final content</p>
+  </div>
+
+  <script src="silktide-consent-manager.js"></script>
+  <script>
+    silktideCookieBannerManager.updateCookieBannerConfig({
+      background: { showBackground: true },
+      cookieIcon: { position: "bottomRight" },
+
+      cookieTypes: [
+        {
+          id: "necessary",
+          name: "Necessary",
+          description: `
+            <p><strong>Always on.</strong> These cookies are essential for the website to function
+            (security, basic navigation, accessibility, and saving your cookie preferences).</p>
+          `,
+          required: true,
+          onAccept: function () {
+            console.log('Necessary accepted');
+          }
+        },
+
+        {
+          id: "analytics",
+          name: "Analytics",
+          description: `
+            <p>These cookies and tracking technologies help us understand how people use our
+            website so we can improve performance and user experience. We only run these if you
+            consent.</p>
+
+            <p><strong>Used services:</strong></p>
+            <ul>
+              <li><strong>Google Analytics 4 (GA4)</strong> – site usage and behavior analytics</li>
+              <li><strong>Microsoft Clarity</strong> – session recordings, heatmaps, and usage insights</li>
+              <li><strong>RudderStack</strong> – unified analytics event routing</li>
+            </ul>
+          `,
+          defaultValue: true,
+          onAccept: function () {
+            console.log('Analytics accepted');
+            gtag('consent', 'update', { analytics_storage: 'granted' });
+            dataLayer.push({ event: 'consent_accepted_analytics' });
+          },
+          onReject: function () {
+            console.log('Analytics rejected');
+            gtag('consent', 'update', { analytics_storage: 'denied' });
+          }
+        },
+
+        {
+          id: "advertising",
+          name: "Advertising / Targeting",
+          description: `
+            <p>These cookies and tracking technologies help deliver more relevant ads and measure
+            advertising effectiveness across devices and platforms. They may collect data about
+            browsing activities across websites.</p>
+
+            <p><strong>Used services:</strong></p>
+            <ul>
+              <li><strong>Meta Pixel</strong> – ad measurement and conversion tracking for Facebook/Instagram</li>
+              <li><strong>TikTok Pixel</strong> – audience and conversion tracking for TikTok ads</li>
+              <li><strong>Snap Pixel</strong> – ad performance tracking for Snapchat</li>
+            </ul>
+          `,
+          onAccept: function () {
+            console.log('Advertising accepted');
+            // gtag('consent', 'update', {
+            //   ad_storage: 'granted',
+            //   ad_user_data: 'granted',
+            //   ad_personalization: 'granted'
+            // });
+            // dataLayer.push({ event: 'consent_accepted_advertising' });
+          },
+          onReject: function () {
+            console.log('Advertising rejected');
+            // gtag('consent', 'update', {
+            //   ad_storage: 'denied',
+            //   ad_user_data: 'denied',
+            //   ad_personalization: 'denied'
+            // });
+          }
+        }
+      ],
+
+      text: {
+        banner: {
+          description: `
+            <p>
+              We and our partners use cookies and similar tracking technologies to operate the site,
+              analyze traffic, improve user experience, and (if enabled) deliver and measure
+              relevant advertising. You can accept all cookies, reject non-essential cookies, or
+              customize your preferences.
+              <a href="https://www.trinitasintelligence.com/privacy-policy" target="_blank" rel="noopener noreferrer">
+                Privacy Policy
+              </a>
+              &nbsp;|&nbsp;
+              <a href="https://www.trinitasintelligence.com/cookie-policy" target="_blank" rel="noopener noreferrer">
+                Cookie Policy
+              </a>
+            </p>
+          `,
+          acceptAllButtonText: "Accept all",
+          acceptAllButtonAccessibleLabel: "Accept all cookies",
+          rejectNonEssentialButtonText: "Reject non-essential",
+          rejectNonEssentialButtonAccessibleLabel: "Reject non-essential cookies",
+          preferencesButtonText: "Preferences",
+          preferencesButtonAccessibleLabel: "Manage cookie preferences"
+        },
+
+        preferences: {
+          title: "Cookie preferences",
+          description: `
+            <p>
+              Choose which optional cookies and tracking technologies you want to enable. These
+              preferences apply to your visit and can be updated at any time.
+            </p>
+          `
+        }
+      },
+
+      position: {
+        banner: "bottomRight"
+      },
+      
+      onPreferencesClose: function() {
+        console.log('✅ Preferences closed callback');
+        // Check state after close
+        setTimeout(() => {
+          console.log('=== STATE CHECK ===');
+          console.log('Body overflow:', document.body.style.overflow || 'not set');
+          console.log('Body position:', document.body.style.position || 'not set');
+          
+          const backdropGlobal = document.getElementById('silktide-backdrop-global');
+          if (backdropGlobal) {
+            console.log('backdropGlobal display:', backdropGlobal.style.display);
+          }
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>
+

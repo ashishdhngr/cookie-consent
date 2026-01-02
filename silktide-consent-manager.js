@@ -926,12 +926,24 @@ class SilktideCookieBanner {
   // Consent Handling
   // ----------------------------------------------------------------
   handleCookieChoice(accepted) {
+    console.log('🍪 handleCookieChoice called, accepted:', accepted);
+
     // We set that an initial choice was made regardless of what it was so we don't show the banner again
     this.setInitialCookieChoiceMade();
 
     this.removeBanner();
-    // toggleModal(false) will handle hiding backdrop, restoring scroll, and showing icon
-    this.toggleModal(false);
+
+    // Close modal if it exists (this will handle backdrop hiding and scroll restoration)
+    // If modal doesn't exist, we still need to clean up
+    if (this.modal) {
+      console.log('  - Closing modal');
+      this.toggleModal(false);
+    } else {
+      console.log('  - No modal to close, cleaning up backdrop and scroll');
+      // Modal was never opened, but we still need to hide backdrop from banner
+      this.hideBackdrop();
+      this.allowBodyScroll();
+    }
 
     this.config.cookieTypes.forEach((type) => {
       // Set localStorage and run accept/reject callbacks
