@@ -817,11 +817,14 @@ class SilktideCookieBanner {
   }
 
   showBackdrop() {
+    console.log('👁️ showBackdrop called');
     if (this.backdrop) {
       this.backdrop.style.display = 'block';
+      console.log('  - backdrop displayed');
     }
     if (this.backdropGlobal) {
       this.backdropGlobal.style.display = 'block';
+      console.log('  - backdropGlobal displayed');
     }
     // Trigger optional onBackdropOpen callback
     if (typeof this.config.onBackdropOpen === 'function') {
@@ -830,11 +833,14 @@ class SilktideCookieBanner {
   }
 
   hideBackdrop() {
+    console.log('🙈 hideBackdrop called');
     if (this.backdrop) {
       this.backdrop.style.display = 'none';
+      console.log('  - backdrop hidden');
     }
     if (this.backdropGlobal) {
       this.backdropGlobal.style.display = 'none';
+      console.log('  - backdropGlobal hidden');
     }
 
     // Trigger optional onBackdropClose callback
@@ -924,9 +930,8 @@ class SilktideCookieBanner {
     this.setInitialCookieChoiceMade();
 
     this.removeBanner();
-    this.hideBackdrop();
+    // toggleModal(false) will handle hiding backdrop, restoring scroll, and showing icon
     this.toggleModal(false);
-    this.showCookieIcon();
 
     this.config.cookieTypes.forEach((type) => {
       // Set localStorage and run accept/reject callbacks
@@ -1246,7 +1251,7 @@ class SilktideCookieBanner {
       'Get this banner for free';
     const creditLinkAccessibleLabel =
       this.config.text?.preferences?.creditLinkAccessibleLabel;
-    const creditLink = ' ';
+    const creditLink = '';
 
     const modalContent = `
       <header>
@@ -1313,9 +1318,11 @@ class SilktideCookieBanner {
   toggleModal(show) {
     if (!this.modal) return;
 
+    console.log(`toggleModal(${show})`);
     this.modal.style.display = show ? 'flex' : 'none';
 
     if (show) {
+      console.log('🔵 Opening modal');
       this.showBackdrop();
       this.hideCookieIcon();
       this.removeBanner();
@@ -1340,9 +1347,24 @@ class SilktideCookieBanner {
       // Save current checkbox states to storage
       this.updateCheckboxState(true);
 
+      // Hide backdrop and restore page interaction
       this.hideBackdrop();
-      this.showCookieIcon();
+
+      // Restore body scrolling
       this.allowBodyScroll();
+
+      // Show cookie icon
+      this.showCookieIcon();
+
+      // Double-check that backdrop elements are hidden (safety check)
+      if (this.backdrop) {
+        this.backdrop.style.display = 'none';
+      }
+      if (this.backdropGlobal) {
+        this.backdropGlobal.style.display = 'none';
+      }
+
+      console.log('✅ Modal closed - backdrop hidden, scroll restored');
 
       // Trigger optional onPreferencesClose callback
       if (typeof this.config.onPreferencesClose === 'function') {
@@ -1393,9 +1415,12 @@ class SilktideCookieBanner {
   }
 
   showCookieIcon() {
-    if (this.cookieIcon) {
-      this.cookieIcon.style.display = 'flex';
-    }
+    //edit/modified - hide cookie icon
+    return;
+    //edit/original - show cookie icon
+    // if (this.cookieIcon) {
+    //   this.cookieIcon.style.display = 'flex';
+    // }
   }
 
   hideCookieIcon() {
@@ -1468,7 +1493,7 @@ class SilktideCookieBanner {
         this.handleCookieChoice(false)
       );
       preferencesButton?.addEventListener('click', () => {
-        this.showBackdrop();
+        // toggleModal(true) will handle showing the backdrop
         this.toggleModal(true);
       });
 
@@ -1639,16 +1664,40 @@ class SilktideCookieBanner {
   }
 
   preventBodyScroll() {
+    console.log('🔒 preventBodyScroll called');
     document.body.style.overflow = 'hidden';
     // Prevent iOS Safari scrolling
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
+    console.log(
+      'Body styles:',
+      document.body.style.overflow,
+      document.body.style.position
+    );
   }
 
   allowBodyScroll() {
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
+    console.log('🔓 allowBodyScroll called');
+    // Remove inline styles to restore scrolling
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('width');
+
+    // Double-check they're cleared (fallback)
+    if (document.body.style.overflow) {
+      document.body.style.overflow = '';
+    }
+    if (document.body.style.position) {
+      document.body.style.position = '';
+    }
+    if (document.body.style.width) {
+      document.body.style.width = '';
+    }
+
+    console.log(
+      'Body styles after restore:',
+      document.body.style.cssText || 'none'
+    );
   }
 }
 
