@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silktide Cookie Consent - Basic Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #333;
+      }
+      .info-box {
+        background: #f4f4f4;
+        border-left: 4px solid #533be2;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      code {
+        background: #eee;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🍪 Silktide Cookie Consent - Basic Example</h1>
+
+    <div class="info-box">
+      <p><strong>What this example shows:</strong></p>
+      <ul>
+        <li>✅ Minimal configuration</li>
+        <li>✅ Two cookie categories (Necessary + Analytics)</li>
+        <li>✅ Console logging for callbacks</li>
+        <li>✅ Shadow DOM CSS isolation</li>
+      </ul>
+    </div>
+
+    <h2>Your Website Content</h2>
+    <p>
+      This is your main website content. The cookie consent banner will appear
+      on first visit.
+    </p>
+
+    <p>
+      After accepting/rejecting, a cookie icon will appear in the bottom-left
+      corner. Click it to reopen preferences.
+    </p>
+
+    <h3>Testing</h3>
+    <p>
+      Open the browser console (F12) to see callback logs. To reset consent and
+      show the banner again:
+    </p>
+    <code>localStorage.clear(); location.reload();</code>
+
+    <!-- Cookie Consent Widget - Single Script Import -->
+    <script src="silktide-consent-manager.js"></script>
+    <script>
+      silktideCookieBannerManager.updateCookieBannerConfig({
+        // Cookie categories
+        cookieTypes: [
+          {
+            id: 'necessary',
+            name: 'Necessary Cookies',
+            description:
+              '<p>These cookies are essential for the website to function properly. They cannot be disabled.</p>',
+            required: true,
+            onAccept: function () {
+              console.log('✅ Necessary cookies accepted (always on)');
+            },
+          },
+          {
+            id: 'analytics',
+            name: 'Analytics Cookies',
+            description:
+              '<p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.</p>',
+            defaultValue: true,
+            onAccept: function () {
+              console.log('✅ Analytics cookies accepted');
+              // Here you would load your analytics script
+              // Example: Load Google Analytics
+              // gtag('consent', 'update', { analytics_storage: 'granted' });
+            },
+            onReject: function () {
+              console.log('❌ Analytics cookies rejected');
+              // Here you would disable analytics
+              // Example: gtag('consent', 'update', { analytics_storage: 'denied' });
+            },
+          },
+        ],
+
+        // Customize text (optional)
+        text: {
+          banner: {
+            description:
+              '<p>We use cookies to improve your experience on our site. You can choose which cookies to accept.</p>',
+          },
+        },
+
+        // Event callbacks (optional)
+        onBannerOpen: function () {
+          console.log('🎯 Banner opened');
+        },
+        onBannerClose: function () {
+          console.log('🎯 Banner closed');
+        },
+        onAcceptAll: function () {
+          console.log('🎉 User accepted all cookies');
+        },
+        onRejectAll: function () {
+          console.log('🚫 User rejected non-essential cookies');
+        },
+      });
+    </script>
+  </body>
+</html>

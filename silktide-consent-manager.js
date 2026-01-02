@@ -1,14 +1,669 @@
 // Silktide Consent Manager - https://silktide.com/consent-manager/  
 
+// Embedded CSS - Will be injected into Shadow DOM or document head as fallback
+const SILKTIDE_CONSENT_MANAGER_CSS = `/* 
+  Silktide Consent Manager - https://silktide.com/consent-manager/  
+  Styles are isolated using Shadow DOM to prevent CSS leakage
+*/
+
+/* --------------------------------
+  CSS Variables - Define at shadow root level
+-------------------------------- */
+:root,
+:host {
+  --focus: 0 0 0 2px #ffffff, 0 0 0 4px #000000, 0 0 0 6px #ffffff;
+  --boxShadow: -5px 5px 10px 0px #00000012, 0px 0px 50px 0px #0000001a;
+  --fontFamily: Helvetica Neue, Segoe UI, Arial, sans-serif;
+  --primaryColor: #533BE2;
+  --backgroundColor: #FFFFFF;
+  --textColor: #4B494B;
+  --backdropBackgroundColor: #00000033;
+  --backdropBackgroundBlur: 0px;
+  --cookieIconColor: #4B494B;
+  --cookieIconBackgroundColor: #FFFFFF;
+}
+
+/* Backdrop (Global) */
+#silktide-backdrop-global {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  border: 0px;
+  display: none;
+}
+
+/* --------------------------------
+  Widget Content Styles - These are inside Shadow DOM
+-------------------------------- */
+/* 
+  Shadow DOM blocks direct selectors but NOT CSS inheritance.
+  Inherited properties (color, font-family, etc.) pass through from the host.
+  
+  Solution: Explicitly set ALL inherited properties to break the inheritance chain
+*/
+
+/* Universal reset - explicitly set all inherited properties to break inheritance from light DOM */
+* {
+  /* Text properties - use explicit values to override ANY inheritance */
+  color: var(--textColor, #4B494B);
+  font-family: var(--fontFamily, Helvetica Neue, Segoe UI, Arial, sans-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-decoration: none;
+  text-indent: 0;
+  white-space: normal;
+  
+  /* Box model */
+  box-sizing: border-box;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+/* Links */
+a {
+  all: unset;
+  display: inline-block;
+  color: var(--primaryColor);
+  text-decoration: underline;
+  font-family: var(--fontFamily);
+}
+
+a:hover {
+  cursor: pointer;
+  color: var(--textColor);
+}
+
+/* --------------------------------
+  Focus Styles
+-------------------------------- */
+a:focus,
+#silktide-banner button:focus,
+#silktide-modal button:focus,
+#silktide-cookie-icon:focus {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 5px;
+}
+
+#silktide-cookie-icon:focus {
+  border-radius: 50%;
+}
+
+/* --------------------------------
+  General Styles
+-------------------------------- */
+.st-button {
+  all: unset;
+  color: var(--backgroundColor);
+  background-color: var(--primaryColor);
+  border: 2px solid var(--primaryColor);
+  padding: 10px 20px;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+}
+
+.st-button--primary {
+}
+
+.st-button--primary:hover {
+  background-color: var(--backgroundColor);
+  color: var(--primaryColor);
+}
+
+.st-button--secondary {
+  background-color: var(--backgroundColor);
+  color: var(--primaryColor);
+}
+
+.st-button--secondary:hover {
+  background-color: var(--primaryColor);
+  color: var(--backgroundColor);
+}
+
+/* --------------------------------
+  Banner
+-------------------------------- */
+#silktide-banner {
+  font-family: var(--fontFamily);
+  color: var(--textColor);
+  background-color: var(--backgroundColor);
+  box-sizing: border-box;
+  padding: 32px;
+  border-radius: 5px;
+  pointer-events: auto;
+  border: 0px;
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 600px;
+  overflow: auto;
+  max-width: calc(100% - 32px);
+  max-height: calc(100vh - 32px);
+  transform: translate(0, -20px);
+  opacity: 0;
+  animation: silktide-slideInDown 350ms ease-out forwards;
+  animation-delay: 0.3s;
+  box-shadow: -5px 5px 10px 0px #00000012, 0px 0px 50px 0px #0000001a;
+  z-index: 100000;
+  margin: 0;
+}
+
+#silktide-banner:focus {
+  border-radius: 50%;
+}
+
+#silktide-banner.center {
+  top: 50%;
+  left: 50%;
+  bottom: auto;
+  right: auto;
+  position: fixed;
+  transform: translate(-50%, calc(-50% - 20px));
+  animation: silktide-slideInDown-center 350ms ease-out forwards;
+}
+
+#silktide-banner.bottomLeft {
+  bottom: 16px;
+  left: 16px;
+  position: fixed;
+}
+
+#silktide-banner.bottomCenter {
+  bottom: 16px;
+  left: 50%;
+  position: fixed;
+  transform: translate(-50%, -20px);
+  animation: silktide-slideInDown-bottomCenter 350ms ease-out forwards;
+}
+
+#silktide-banner .preferences {
+  all: unset;
+  display: flex;
+  gap: 5px;
+  border: none;
+  padding: 15px 0px;
+  background-color: transparent;
+  color: var(--primaryColor);
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+}
+
+#silktide-banner .preferences span {
+  display: block;
+  white-space: nowrap;
+  text-decoration: underline;
+}
+
+#silktide-banner .preferences span:hover {
+  color: var(--textColor);
+}
+
+#silktide-banner .preferences:after {
+  display: block;
+  content: '>';
+  text-decoration: none;
+}
+
+#silktide-banner p {
+  all: unset;
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0px 0px 15px;
+  font-family: var(--fontFamily);
+  color: var(--textColor);
+  box-sizing: border-box;
+}
+
+#silktide-banner a {
+  display: inline-block;
+  color: var(--primaryColor);
+  text-decoration: underline;
+  background-color: var(--backgroundColor);
+}
+
+#silktide-banner a:hover {
+  color: var(--textColor);
+}
+
+#silktide-banner a.silktide-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  fill: var(--primaryColor);
+  margin-left: auto;
+  width: 48px;
+  height: 48px;
+}
+
+#silktide-banner .actions {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  margin-top: 24px;
+}
+
+@media (min-width: 600px) {
+  #silktide-banner .actions {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+#silktide-banner .actions-row {
+  display: flex;
+  gap: 16px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+/* --------------------------------
+  Modal
+-------------------------------- */
+#silktide-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 20px));
+  pointer-events: auto;
+  overflow: auto;
+  width: 800px;
+  max-width: calc(100% - 32px);
+  max-height: calc(100vh - 32px);
+  border: 0px;
+  opacity: 0;
+  animation: silktide-slideInUp-center 350ms ease-out forwards;
+  box-shadow: -5px 5px 10px 0px #00000012, 0px 0px 50px 0px #0000001a;
+  font-family: var(--fontFamily);
+  color: var(--textColor);
+  flex-direction: column;
+  padding: 30px;
+  background-color: var(--backgroundColor);
+  border-radius: 5px;
+  box-sizing: border-box;
+  z-index: 100000;
+  margin: 0;
+}
+
+#silktide-modal[style*="display: flex"],
+#silktide-modal[style*="display:flex"] {
+  display: flex !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+}
+
+/* --------------------------------
+  Modal - Header
+-------------------------------- */
+#silktide-modal header {
+  all: unset;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+#silktide-modal h1 {
+  all: unset;
+  display: block;
+  font-family: var(--fontFamily);
+  color: var(--textColor);
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+#silktide-modal .modal-close {
+  all: unset;
+  display: inline-flex;
+  border: none;
+  padding: 13px;
+  border: 0px;
+  cursor: pointer;
+  background: var(--backgroundColor);
+  color: var(--primaryColor);
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+}
+
+#silktide-modal .modal-close svg {
+  fill: var(--primaryColor);
+}
+
+/* --------------------------------
+  Modal - Content
+-------------------------------- */
+#silktide-modal section {
+  all: unset;
+  display: block;
+  flex: 1;
+  margin-top: 32px;
+  box-sizing: border-box;
+}
+
+#silktide-modal section::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+#silktide-modal section::-webkit-scrollbar-thumb {
+  background-color: var(--textColor);
+  border-radius: 10px;
+}
+
+#silktide-modal p {
+  all: unset;
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--textColor);
+  margin: 0px 0px 15px;
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+}
+
+#silktide-modal p:last-of-type {
+  margin: 0px;
+}
+
+#silktide-modal fieldset {
+  all: unset;
+  display: block;
+  padding: 0px;
+  border: none;
+  margin: 0px 0px 32px;
+  box-sizing: border-box;
+}
+
+#silktide-modal fieldset:last-of-type {
+  margin: 0px;
+}
+
+#silktide-modal legend {
+  all: unset;
+  display: block;
+  padding: 0px;
+  margin: 0px 0px 10px;
+  font-weight: 700;
+  color: var(--textColor);
+  font-size: 16px;
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+}
+
+#silktide-modal .cookie-type-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+/* --------------------------------
+  Modal - Switches
+-------------------------------- */
+#silktide-modal .switch {
+  flex-shrink: 0;
+  position: relative;
+  display: inline-block;
+  height: 34px;
+  width: 74px;
+  cursor: pointer;
+}
+
+#silktide-modal .switch:focus-within {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 25px;
+}
+
+#silktide-modal .switch input {
+  all: unset;
+  opacity: 0;
+  position: absolute;
+  box-sizing: border-box;
+}
+
+#silktide-modal label {
+  all: unset;
+  display: inline-block;
+  box-sizing: border-box;
+  font-family: var(--fontFamily);
+}
+
+/* Unchecked Switch Styles */
+#silktide-modal .switch__pill {
+  position: relative;
+  display: block;
+  height: 34px;
+  width: 74px;
+  background: var(--textColor);
+  border-radius: 25px;
+}
+
+#silktide-modal .switch__dot {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: block;
+  height: 30px;
+  width: 30px;
+  background: var(--backgroundColor);
+  border-radius: 50%;
+  transition: left 150ms ease-out;
+}
+
+#silktide-modal .switch__off,
+#silktide-modal .switch__on {
+  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--backgroundColor);
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  transition: right 150ms ease-out, opacity 150ms ease-out;
+}
+
+#silktide-modal .switch__off {
+  opacity: 1;
+}
+
+#silktide-modal .switch__on {
+  opacity: 0;
+}
+
+/* Checked Switch Styles */
+#silktide-modal .switch input:checked + .switch__pill {
+  background: var(--primaryColor);
+}
+
+#silktide-modal .switch input:checked ~ .switch__dot {
+  left: calc(100% - 32px);
+}
+
+#silktide-modal .switch input:checked ~ .switch__off {
+  right: calc(100% - 32px);
+  opacity: 0;
+}
+
+#silktide-modal .switch input:checked ~ .switch__on {
+  right: calc(100% - 34px);
+  opacity: 1;
+}
+
+/* Disabled Switch Styles */
+#silktide-modal .switch input:disabled + .switch__pill {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* --------------------------------
+  Modal - Footer
+-------------------------------- */
+#silktide-modal footer {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 600px) {
+  #silktide-modal footer {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+#silktide-modal footer a {
+  margin-left: auto;
+  padding: 14px 0px;
+}
+
+/* Cookie Icon */
+#silktide-cookie-icon {
+  all: unset;
+  display: none;
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 0px;
+  border: none;
+  background-color: var(--cookieIconColor);
+  cursor: pointer;
+  box-shadow: 0px 0px 6px 0px #0000001a;
+  pointer-events: auto;
+  animation: silktide-fadeIn 0.3s ease-in-out forwards;
+  z-index: 100000;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#silktide-cookie-icon.bottomRight {
+  left: auto;
+  right: 10px;
+}
+
+#silktide-cookie-icon svg {
+  fill: var(--cookieIconBackgroundColor);
+}
+
+/* --------------------------------
+  Backdrop
+-------------------------------- */
+#silktide-backdrop {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--backdropBackgroundColor);
+  backdrop-filter: blur(var(--backdropBackgroundBlur));
+  pointer-events: all;
+}
+
+/* --------------------------------
+  Animations
+-------------------------------- */
+@keyframes silktide-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes silktide-slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes silktide-slideInDown-center {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% - 20px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes silktide-slideInDown-bottomCenter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes silktide-slideInUp-center {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 20px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}`;
+
 class SilktideCookieBanner {
   constructor(config) {
     this.config = config; // Save config to the instance
 
     this.wrapper = null;
+    this.shadowRoot = null;
     this.banner = null;
     this.modal = null;
     this.cookieIcon = null;
     this.backdrop = null;
+    this.backdropGlobal = null;
+    this.supportsShadowDOM = typeof document.createElement('div').attachShadow === 'function';
 
     this.createWrapper();
 
@@ -40,15 +695,28 @@ class SilktideCookieBanner {
       this.wrapper.parentNode.removeChild(this.wrapper);
     }
 
+    // Remove backdrop global if it exists
+    if (this.backdropGlobal && this.backdropGlobal.parentNode) {
+      this.backdropGlobal.parentNode.removeChild(this.backdropGlobal);
+    }
+
+    // Remove fallback styles if they exist
+    const fallbackStyle = document.getElementById('silktide-consent-manager-fallback-styles');
+    if (fallbackStyle) {
+      fallbackStyle.remove();
+    }
+
     // Restore scrolling
     this.allowBodyScroll();
 
     // Clear all references
     this.wrapper = null;
+    this.shadowRoot = null;
     this.banner = null;
     this.modal = null;
     this.cookieIcon = null;
     this.backdrop = null;
+    this.backdropGlobal = null;
   }
 
   // ----------------------------------------------------------------
@@ -57,7 +725,52 @@ class SilktideCookieBanner {
   createWrapper() {
     this.wrapper = document.createElement('div');
     this.wrapper.id = 'silktide-wrapper';
+    
+    // Apply wrapper styles directly via JavaScript (wrapper is in light DOM)
+    this.wrapper.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 99999;
+      pointer-events: none;
+      border: 0px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    `;
+    
     document.body.insertBefore(this.wrapper, document.body.firstChild);
+
+    if (this.supportsShadowDOM) {
+      // Create Shadow DOM for complete CSS isolation
+      this.shadowRoot = this.wrapper.attachShadow({ mode: 'open' });
+      
+      // Inject CSS into Shadow DOM
+      const style = document.createElement('style');
+      style.textContent = SILKTIDE_CONSENT_MANAGER_CSS;
+      this.shadowRoot.appendChild(style);
+      
+      if (console && console.log) {
+        console.log('✅ Silktide Consent Manager: Shadow DOM enabled - CSS isolation active');
+      }
+    } else {
+      // Fallback: Inject CSS into document head with scoped selectors
+      if (!document.getElementById('silktide-consent-manager-fallback-styles')) {
+        const style = document.createElement('style');
+        style.id = 'silktide-consent-manager-fallback-styles';
+        style.textContent = SILKTIDE_CONSENT_MANAGER_CSS;
+        document.head.appendChild(style);
+      }
+      
+      // Use wrapper as the shadow root equivalent for fallback
+      this.shadowRoot = this.wrapper;
+      
+      if (console && console.warn) {
+        console.warn('Silktide Consent Manager: Shadow DOM not supported, using fallback mode');
+      }
+    }
   }
 
   // ----------------------------------------------------------------
@@ -67,15 +780,17 @@ class SilktideCookieBanner {
     // Create child element
     const child = document.createElement('div');
     child.id = id;
-    child.innerHTML = htmlContent;
+    if (htmlContent) {
+      child.innerHTML = htmlContent;
+    }
 
     // Ensure wrapper exists
     if (!this.wrapper || !document.body.contains(this.wrapper)) {
       this.createWrapper();
     }
 
-    // Append child to wrapper
-    this.wrapper.appendChild(child);
+    // Append child to shadow root (or wrapper in fallback mode)
+    this.shadowRoot.appendChild(child);
     return child;
   }
 
@@ -83,12 +798,21 @@ class SilktideCookieBanner {
   // Backdrop
   // ----------------------------------------------------------------
   createBackdrop() {
+    // Create backdrop inside Shadow DOM (for widget backdrop)
     this.backdrop = this.createWrapperChild(null, 'silktide-backdrop');
+    
+    // Create global backdrop in main DOM (for full-page overlay)
+    this.backdropGlobal = document.createElement('div');
+    this.backdropGlobal.id = 'silktide-backdrop-global';
+    document.body.appendChild(this.backdropGlobal);
   }
 
   showBackdrop() {
     if (this.backdrop) {
       this.backdrop.style.display = 'block';
+    }
+    if (this.backdropGlobal) {
+      this.backdropGlobal.style.display = 'block';
     }
     // Trigger optional onBackdropOpen callback
     if (typeof this.config.onBackdropOpen === 'function') {
@@ -99,6 +823,9 @@ class SilktideCookieBanner {
   hideBackdrop() {
     if (this.backdrop) {
       this.backdrop.style.display = 'none';
+    }
+    if (this.backdropGlobal) {
+      this.backdropGlobal.style.display = 'none';
     }
 
     // Trigger optional onBackdropClose callback
@@ -114,6 +841,8 @@ class SilktideCookieBanner {
   // update the checkboxes in the modal with the values from localStorage
   updateCheckboxState(saveToStorage = false) {
     const preferencesSection = this.modal.querySelector('#cookie-preferences');
+    if (!preferencesSection) return;
+    
     const checkboxes = preferencesSection.querySelectorAll('input[type="checkbox"]');
 
     checkboxes.forEach((checkbox) => {
@@ -215,6 +944,15 @@ class SilktideCookieBanner {
       acc[cookieType.id] =
         localStorage.getItem(`silktideCookieChoice_${cookieType.id}${this.getBannerSuffix()}`) ===
         'true';
+      return acc;
+    }, {});
+  }
+
+  getRejectedCookies() {
+    return (this.config.cookieTypes || []).reduce((acc, cookieType) => {
+      acc[cookieType.id] =
+        localStorage.getItem(`silktideCookieChoice_${cookieType.id}${this.getBannerSuffix()}`) ===
+        'false';
       return acc;
     }, {});
   }
@@ -473,7 +1211,7 @@ class SilktideCookieBanner {
   }
 
   createModal() {
-    // Create banner element
+    // Create modal element
     this.modal = this.createWrapperChild(this.getModalContent(), 'silktide-modal');
   }
 
@@ -490,7 +1228,9 @@ class SilktideCookieBanner {
 
       // Focus the close button
       const modalCloseButton = this.modal.querySelector('.modal-close');
-      modalCloseButton.focus();
+      if (modalCloseButton) {
+        modalCloseButton.focus();
+      }
 
       // Trigger optional onPreferencesOpen callback
       if (typeof this.config.onPreferencesOpen === 'function') {
@@ -542,8 +1282,8 @@ class SilktideCookieBanner {
       this.createWrapper();
     }
 
-    // Append child to wrapper
-    this.wrapper.appendChild(this.cookieIcon);
+    // Append child to shadow root (or wrapper in fallback mode)
+    this.shadowRoot.appendChild(this.cookieIcon);
 
     // Add positioning class from config
     if (this.cookieIcon && this.config.cookieIcon?.position) {
@@ -678,7 +1418,7 @@ class SilktideCookieBanner {
       acceptAllButton?.addEventListener('click', () => this.handleCookieChoice(true));
       rejectAllButton?.addEventListener('click', () => this.handleCookieChoice(false));
 
-      // Banner Focus Trap
+      // Modal Focus Trap
       const focusableElements = this.getFocusableElements(this.modal);
       const firstFocusableEl = focusableElements[0];
       const lastFocusableEl = focusableElements[focusableElements.length - 1];
@@ -702,42 +1442,46 @@ class SilktideCookieBanner {
         }
       });
 
-      closeButton?.focus();
+      if (closeButton) {
+        closeButton.focus();
+      }
 
       // Update the checkbox event listeners
       const preferencesSection = this.modal.querySelector('#cookie-preferences');
-      const checkboxes = preferencesSection.querySelectorAll('input[type="checkbox"]');
-      
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', (event) => {
-          const [, cookieId] = event.target.id.split('cookies-');
-          const isAccepted = event.target.checked;
-          const previousValue = localStorage.getItem(
-            `silktideCookieChoice_${cookieId}${this.getBannerSuffix()}`
-          ) === 'true';
-          
-          // Only proceed if the value has actually changed
-          if (isAccepted !== previousValue) {
-            // Find the corresponding cookie type
-            const cookieType = this.config.cookieTypes.find(type => type.id === cookieId);
+      if (preferencesSection) {
+        const checkboxes = preferencesSection.querySelectorAll('input[type="checkbox"]');
+        
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', (event) => {
+            const [, cookieId] = event.target.id.split('cookies-');
+            const isAccepted = event.target.checked;
+            const previousValue = localStorage.getItem(
+              `silktideCookieChoice_${cookieId}${this.getBannerSuffix()}`
+            ) === 'true';
             
-            if (cookieType) {
-              // Update localStorage
-              localStorage.setItem(
-                `silktideCookieChoice_${cookieId}${this.getBannerSuffix()}`,
-                isAccepted.toString()
-              );
+            // Only proceed if the value has actually changed
+            if (isAccepted !== previousValue) {
+              // Find the corresponding cookie type
+              const cookieType = this.config.cookieTypes.find(type => type.id === cookieId);
               
-              // Run the appropriate callback only if the value changed
-              if (isAccepted && typeof cookieType.onAccept === 'function') {
-                cookieType.onAccept();
-              } else if (!isAccepted && typeof cookieType.onReject === 'function') {
-                cookieType.onReject();
+              if (cookieType) {
+                // Update localStorage
+                localStorage.setItem(
+                  `silktideCookieChoice_${cookieId}${this.getBannerSuffix()}`,
+                  isAccepted.toString()
+                );
+                
+                // Run the appropriate callback only if the value changed
+                if (isAccepted && typeof cookieType.onAccept === 'function') {
+                  cookieType.onAccept();
+                } else if (!isAccepted && typeof cookieType.onReject === 'function') {
+                  cookieType.onReject();
+                }
               }
             }
-          }
+          });
         });
-      });
+      }
     }
 
     // Check Cookie Icon exists before trying to add event listeners
@@ -795,7 +1539,7 @@ class SilktideCookieBanner {
 
     // If cookie banner exists, destroy and recreate it with new config
     if (cookieBanner) {
-      cookieBanner.destroyCookieBanner(); // We'll need to add this method
+      cookieBanner.destroyCookieBanner();
       cookieBanner = null;
     }
 
@@ -810,7 +1554,7 @@ class SilktideCookieBanner {
 
   function initCookieBanner() {
     if (!cookieBanner) {
-      cookieBanner = new SilktideCookieBanner(config); // Pass config to the CookieBanner instance
+      cookieBanner = new SilktideCookieBanner(config);
     }
   }
 

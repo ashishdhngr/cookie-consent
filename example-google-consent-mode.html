@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silktide Cookie Consent - Google Consent Mode Example</title>
+
+    <!-- Step 1: Initialize Google Consent Mode (BEFORE GTM) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      // Set default consent state - all denied until user accepts
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500,
+      });
+
+      console.log('🔒 Google Consent Mode initialized - all denied by default');
+    </script>
+
+    <!-- Step 2: Load Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-XXXXXXX');
+      console.log('📊 Google Tag Manager loaded');
+    </script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #333;
+      }
+      .info-box {
+        background: #e8f4f8;
+        border-left: 4px solid #1a73e8;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .warning-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      code {
+        background: #eee;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+      pre {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🍪 Google Consent Mode v2 Integration</h1>
+
+    <div class="info-box">
+      <p><strong>This example demonstrates:</strong></p>
+      <ul>
+        <li>✅ Google Consent Mode v2 initialization</li>
+        <li>✅ GTM integration</li>
+        <li>✅ Consent state updates via dataLayer</li>
+        <li>✅ Analytics and Advertising consent categories</li>
+      </ul>
+    </div>
+
+    <div class="warning-box">
+      <p>
+        <strong>⚠️ Note:</strong> Replace <code>GTM-XXXXXXX</code> with your
+        actual GTM container ID in the script above.
+      </p>
+    </div>
+
+    <h2>How It Works</h2>
+    <ol>
+      <li>Google Consent Mode initializes with all consent denied</li>
+      <li>Google Tag Manager loads</li>
+      <li>Cookie consent banner appears</li>
+      <li>User makes choice → consent state updates via <code>gtag()</code></li>
+      <li>Tags in GTM respect consent state</li>
+    </ol>
+
+    <h2>Check Console</h2>
+    <p>Open the browser console (F12) to see:</p>
+    <ul>
+      <li>Consent Mode initialization</li>
+      <li>GTM load</li>
+      <li>Consent updates when you accept/reject</li>
+      <li>DataLayer events</li>
+    </ul>
+
+    <h3>Reset Consent</h3>
+    <p>To test again, run in console:</p>
+    <pre><code>localStorage.clear();
+location.reload();</code></pre>
+
+    <h2>Your Website Content</h2>
+    <p>
+      This is where your main content would go. The cookie banner will appear on
+      first visit.
+    </p>
+
+    <!-- Step 3: Load Cookie Consent Manager -->
+    <script src="silktide-consent-manager.js"></script>
+    <script>
+      silktideCookieBannerManager.updateCookieBannerConfig({
+        background: {
+          showBackground: true,
+        },
+
+        cookieTypes: [
+          {
+            id: 'necessary',
+            name: 'Necessary Cookies',
+            description:
+              '<p>These cookies are essential for the website to function properly and cannot be switched off.</p>',
+            required: true,
+            onAccept: function () {
+              console.log('✅ Necessary cookies accepted (always on)');
+            },
+          },
+          {
+            id: 'analytics',
+            name: 'Analytics Cookies',
+            description:
+              '<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>',
+            defaultValue: true,
+            onAccept: function () {
+              console.log('✅ Analytics cookies ACCEPTED');
+
+              // Update Google Consent Mode
+              gtag('consent', 'update', {
+                analytics_storage: 'granted',
+              });
+              console.log(
+                '📊 Google Consent Mode: analytics_storage = granted'
+              );
+
+              // Push event to dataLayer for GTM triggers
+              dataLayer.push({
+                event: 'consent_analytics_granted',
+              });
+              console.log('📤 DataLayer event: consent_analytics_granted');
+            },
+            onReject: function () {
+              console.log('❌ Analytics cookies REJECTED');
+
+              gtag('consent', 'update', {
+                analytics_storage: 'denied',
+              });
+              console.log('📊 Google Consent Mode: analytics_storage = denied');
+            },
+          },
+          {
+            id: 'advertising',
+            name: 'Advertising Cookies',
+            description:
+              '<p>These cookies are used to deliver personalized advertisements and track advertising campaign performance.</p>',
+            defaultValue: false,
+            onAccept: function () {
+              console.log('✅ Advertising cookies ACCEPTED');
+
+              // Update Google Consent Mode for ads
+              gtag('consent', 'update', {
+                ad_storage: 'granted',
+                ad_user_data: 'granted',
+                ad_personalization: 'granted',
+              });
+              console.log(
+                '📊 Google Consent Mode: ad_storage, ad_user_data, ad_personalization = granted'
+              );
+
+              // Push event to dataLayer
+              dataLayer.push({
+                event: 'consent_advertising_granted',
+              });
+              console.log('📤 DataLayer event: consent_advertising_granted');
+            },
+            onReject: function () {
+              console.log('❌ Advertising cookies REJECTED');
+
+              gtag('consent', 'update', {
+                ad_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+              });
+              console.log(
+                '📊 Google Consent Mode: ad_storage, ad_user_data, ad_personalization = denied'
+              );
+            },
+          },
+        ],
+
+        text: {
+          banner: {
+            description:
+              "<p>We use cookies to enhance your experience, analyze traffic, and serve personalized ads. <a href='#'>Learn more</a></p>",
+            acceptAllButtonText: 'Accept All',
+            rejectNonEssentialButtonText: 'Reject Non-Essential',
+          },
+          preferences: {
+            title: 'Manage Cookie Preferences',
+            description:
+              '<p>Choose which cookies you want to allow. Your preferences will be saved for future visits.</p>',
+          },
+        },
+
+        onAcceptAll: function () {
+          console.log('🎉 User clicked Accept All');
+        },
+        onRejectAll: function () {
+          console.log('🚫 User clicked Reject Non-Essential');
+        },
+      });
+    </script>
+
+    <!-- GTM noscript fallback -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe>
+    </noscript>
+  </body>
+</html>
